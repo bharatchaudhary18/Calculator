@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Calculator</title>
+  <style>
+    body {
+      background: #f0f0f0;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .calculator {
+      background: #1e1e1e;
+      padding: 20px;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      width: 340px;
+    }
+
+    .display {
+      background: #000;
+      color: #0f0;
+      font-size: 2.5em;
+      text-align: right;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      overflow-x: auto;
+      height: 70px;
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 15px;
+    }
+
+    button {
+      padding: 20px;
+      font-size: 1.5em;
+      border: none;
+      border-radius: 12px;
+      background: #2e2e2e;
+      color: #fff;
+      cursor: pointer;
+      box-shadow: 0 4px #00000050;
+      transition: 0.2s;
+    }
+
+    button:hover {
+      background: #444;
+    }
+
+    button:active {
+      transform: scale(0.97);
+    }
+
+    .operator {
+      background: #0bf0fc;
+    }
+
+    .equal {
+      background: #00c853;
+    }
+
+    .clear {
+      background: #d50000;
+    }
+
+    .delete {
+      background: #e54242;
+    }
+
+    .zero {
+      grid-column: span 2;
+    }
+  </style>
+</head>
+<body>
+  <div class="calculator">
+    <div class="display" id="display">0</div>
+    <div class="buttons">
+      <button class="clear" onclick="clearDisplay()">C</button>
+      <button class="delete" onclick="deleteLast()">DEL</button>
+      <button class="operator" onclick="appendOperator('/')">÷</button>
+      <button class="operator" onclick="appendOperator('*')">×</button>
+
+      <button onclick="appendNumber('7')">7</button>
+      <button onclick="appendNumber('8')">8</button>
+      <button onclick="appendNumber('9')">9</button>
+      <button class="operator" onclick="appendOperator('-')">−</button>
+
+      <button onclick="appendNumber('4')">4</button>
+      <button onclick="appendNumber('5')">5</button>
+      <button onclick="appendNumber('6')">6</button>
+      <button class="operator" onclick="appendOperator('+')">+</button>
+
+      <button onclick="appendNumber('1')">1</button>
+      <button onclick="appendNumber('2')">2</button>
+      <button onclick="appendNumber('3')">3</button>
+      <button class="equal" onclick="calculate()">=</button>
+
+      <button class="zero" onclick="appendNumber('0')">0</button>
+      <button onclick="appendDot()">.</button>
+    </div>
+  </div>
+
+  <script>
+    const display = document.getElementById('display');
+    let currentInput = '';
+    let hasDot = false;
+
+    function updateDisplay() {
+      display.textContent = currentInput || '0';
+    }
+
+    function appendNumber(num) {
+      if (num === '0' && currentInput === '0') return;
+      currentInput += num;
+      updateDisplay();
+    }
+
+    function appendOperator(op) {
+      if (currentInput === '') return;
+      const lastChar = currentInput.slice(-1);
+      if ('+-*/'.includes(lastChar)) {
+        currentInput = currentInput.slice(0, -1);
+      }
+      currentInput += op;
+      hasDot = false;
+      updateDisplay();
+    }
+
+    function appendDot() {
+      if (hasDot) return;
+      if (currentInput === '' || '+-*/'.includes(currentInput.slice(-1))) {
+        currentInput += '0.';
+      } else {
+        currentInput += '.';
+      }
+      hasDot = true;
+      updateDisplay();
+    }
+
+    function clearDisplay() {
+      currentInput = '';
+      hasDot = false;
+      updateDisplay();
+    }
+
+    function deleteLast() {
+      const lastChar = currentInput.slice(-1);
+      if (lastChar === '.') hasDot = false;
+      currentInput = currentInput.slice(0, -1);
+      updateDisplay();
+    }
+
+    function calculate() {
+      try {
+        const result = Function('"use strict";return (' + currentInput + ')')();
+        currentInput = result.toString();
+        hasDot = currentInput.includes('.');
+        updateDisplay();
+      } catch (e) {
+        display.textContent = 'Error';
+        currentInput = '';
+      }
+    }
+  </script>
+</body>
+</html>
